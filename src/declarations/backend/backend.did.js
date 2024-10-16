@@ -12,14 +12,15 @@ export const idlFactory = ({ IDL }) => {
     'username' : IDL.Text,
     'picture' : IDL.Opt(IDL.Vec(IDL.Nat8)),
   });
-  const Result = IDL.Variant({ 'ok' : Profile, 'err' : IDL.Text });
+  const Result_1 = IDL.Variant({ 'ok' : Profile, 'err' : IDL.Text });
+  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : IDL.Text });
   return IDL.Service({
     'createPost' : IDL.Func([IDL.Text, IDL.Text], [IDL.Nat], []),
     'getPosts' : IDL.Func([], [IDL.Vec(Post)], ['query']),
-    'getProfile' : IDL.Func([], [Result], []),
+    'getProfile' : IDL.Func([], [Result_1], []),
     'updateProfile' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Opt(IDL.Vec(IDL.Nat8))],
-        [],
+        [Result],
         [],
       ),
   });

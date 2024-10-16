@@ -1,8 +1,13 @@
 type Time = int;
-type Result = 
+type Result_1 = 
  variant {
    err: text;
    ok: Profile;
+ };
+type Result = 
+ variant {
+   err: text;
+   ok;
  };
 type Profile = 
  record {
@@ -21,6 +26,6 @@ type Post =
 service : {
   createPost: (text, text) -> (nat);
   getPosts: () -> (vec Post) query;
-  getProfile: () -> (Result);
-  updateProfile: (text, text, opt vec nat8) -> ();
+  getProfile: () -> (Result_1);
+  updateProfile: (text, text, opt vec nat8) -> (Result);
 }

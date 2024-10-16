@@ -14,16 +14,18 @@ export interface Profile {
   'username' : string,
   'picture' : [] | [Uint8Array | number[]],
 }
-export type Result = { 'ok' : Profile } |
+export type Result = { 'ok' : null } |
+  { 'err' : string };
+export type Result_1 = { 'ok' : Profile } |
   { 'err' : string };
 export type Time = bigint;
 export interface _SERVICE {
   'createPost' : ActorMethod<[string, string], bigint>,
   'getPosts' : ActorMethod<[], Array<Post>>,
-  'getProfile' : ActorMethod<[], Result>,
+  'getProfile' : ActorMethod<[], Result_1>,
   'updateProfile' : ActorMethod<
     [string, string, [] | [Uint8Array | number[]]],
-    undefined
+    Result
   >,
 }
 export declare const idlFactory: IDL.InterfaceFactory;

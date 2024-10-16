@@ -57,27 +57,38 @@ async function createPost() {
 }
 
 async function loadProfile() {
-    const result = await backend.getProfile();
-    if ('ok' in result) {
-        const profile = result.ok;
-        document.getElementById('username').value = profile.username;
-        document.getElementById('bio').value = profile.bio;
+    try {
+        const result = await backend.getProfile();
+        if ('ok' in result) {
+            const profile = result.ok;
+            document.getElementById('username').value = profile.username;
+            document.getElementById('bio').value = profile.bio;
+        } else {
+            console.error('Failed to load profile:', result.err);
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
     }
 }
 
 async function updateProfile(event) {
     event.preventDefault();
-    const username = document.getElementById('username').value;
-    const bio = document.getElementById('bio').value;
-    const pictureInput = document.getElementById('profilePicture');
-    let picture = [];
-    if (pictureInput.files.length > 0) {
-        const file = pictureInput.files[0];
-        const arrayBuffer = await file.arrayBuffer();
-        picture = Array.from(new Uint8Array(arrayBuffer));
+    try {
+        const username = document.getElementById('username').value;
+        const bio = document.getElementById('bio').value;
+        const pictureInput = document.getElementById('profilePicture');
+        let picture = [];
+        if (pictureInput.files.length > 0) {
+            const file = pictureInput.files[0];
+            const arrayBuffer = await file.arrayBuffer();
+            picture = Array.from(new Uint8Array(arrayBuffer));
+        }
+        await backend.updateProfile(username, bio, picture.length > 0 ? picture : null);
+        console.log('Profile updated successfully');
+        loadProfile();
+    } catch (error) {
+        console.error('Error updating profile:', error);
     }
-    await backend.updateProfile(username, bio, picture);
-    loadProfile();
 }
 
 document.getElementById('loginBtn').onclick = login;

@@ -1,3 +1,4 @@
+import Error "mo:base/Error";
 import Hash "mo:base/Hash";
 import Nat8 "mo:base/Nat8";
 
@@ -68,13 +69,18 @@ actor {
         Iter.toArray(posts.vals())
     };
 
-    public shared(msg) func updateProfile(username: Text, bio: Text, picture: ?[Nat8]) : async () {
-        let profile : Profile = {
-            username = username;
-            bio = bio;
-            picture = Option.map(picture, Blob.fromArray);
-        };
-        profiles.put(msg.caller, profile);
+    public shared(msg) func updateProfile(username: Text, bio: Text, picture: ?[Nat8]) : async Result.Result<(), Text> {
+        try {
+            let profile : Profile = {
+                username = username;
+                bio = bio;
+                picture = Option.map(picture, Blob.fromArray);
+            };
+            profiles.put(msg.caller, profile);
+            #ok(())
+        } catch (e) {
+            #err("Failed to update profile: " # Error.message(e))
+        }
     };
 
     public shared(msg) func getProfile() : async Result.Result<Profile, Text> {
