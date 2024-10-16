@@ -1,12 +1,8 @@
-type Result_1 = 
- variant {
-   err: text;
-   ok: Profile;
- };
+type Time = int;
 type Result = 
  variant {
    err: text;
-   ok;
+   ok: Profile;
  };
 type Profile = 
  record {
@@ -16,16 +12,15 @@ type Profile =
  };
 type Post = 
  record {
-   author: principal;
    authorUsername: text;
    body: text;
    id: nat;
-   timestamp: int;
+   timestamp: Time;
    title: text;
  };
 service : {
-  createPost: (text, text) -> (Result);
+  createPost: (text, text) -> (nat);
   getPosts: () -> (vec Post) query;
-  getProfile: () -> (Result_1);
-  updateProfile: (text, text, opt blob) -> (Result);
+  getProfile: () -> (Result);
+  updateProfile: (text, text, opt vec nat8) -> ();
 }

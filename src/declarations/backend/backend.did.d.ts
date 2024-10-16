@@ -7,25 +7,23 @@ export interface Post {
   'title' : string,
   'authorUsername' : string,
   'body' : string,
-  'author' : Principal,
-  'timestamp' : bigint,
+  'timestamp' : Time,
 }
 export interface Profile {
   'bio' : string,
   'username' : string,
   'picture' : [] | [Uint8Array | number[]],
 }
-export type Result = { 'ok' : null } |
+export type Result = { 'ok' : Profile } |
   { 'err' : string };
-export type Result_1 = { 'ok' : Profile } |
-  { 'err' : string };
+export type Time = bigint;
 export interface _SERVICE {
-  'createPost' : ActorMethod<[string, string], Result>,
+  'createPost' : ActorMethod<[string, string], bigint>,
   'getPosts' : ActorMethod<[], Array<Post>>,
-  'getProfile' : ActorMethod<[], Result_1>,
+  'getProfile' : ActorMethod<[], Result>,
   'updateProfile' : ActorMethod<
     [string, string, [] | [Uint8Array | number[]]],
-    Result
+    undefined
   >,
 }
 export declare const idlFactory: IDL.InterfaceFactory;

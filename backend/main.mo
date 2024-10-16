@@ -1,103 +1,86 @@
-import Int "mo:base/Int";
-import Nat "mo:base/Nat";
+import Hash "mo:base/Hash";
+import Nat8 "mo:base/Nat8";
 
 import Array "mo:base/Array";
-import Time "mo:base/Time";
+import Blob "mo:base/Blob";
+import Debug "mo:base/Debug";
+import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
+import Nat "mo:base/Nat";
+import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
-import Blob "mo:base/Blob";
+import Time "mo:base/Time";
 
 actor {
-  type Post = {
-    id: Nat;
-    title: Text;
-    body: Text;
-    author: Principal;
-    authorUsername: Text;
-    timestamp: Int;
-  };
-
-  type Profile = {
-    username: Text;
-    bio: Text;
-    picture: ?Blob;
-  };
-
-  stable var posts : [Post] = [];
-  stable var nextId : Nat = 0;
-  stable var profiles : [(Principal, Profile)] = [];
-
-  public shared(msg) func createPost(title: Text, body: Text) : async Result.Result<(), Text> {
-    if (Principal.isAnonymous(msg.caller)) {
-      return #err("You must be logged in to create a post");
+    type Post = {
+        id: Nat;
+        title: Text;
+        body: Text;
+        authorUsername: Text;
+        timestamp: Time.Time;
     };
 
-    let defaultProfile : Profile = {
-      username = "Anonymous";
-      bio = "";
-      picture = null;
+    type Profile = {
+        username: Text;
+        bio: Text;
+        picture: ?Blob;
     };
 
-    let authorProfileResult = getProfileByPrincipal(msg.caller);
-    let authorProfile = switch (authorProfileResult) {
-      case (#ok(profile)) profile;
-      case (#err(_)) defaultProfile;
+    private stable var nextPostId : Nat = 0;
+    private stable var postEntries : [(Nat, Post)] = [];
+    private var posts = HashMap.HashMap<Nat, Post>(0, Nat.equal, Nat.hash);
+
+    private stable var profileEntries : [(Principal, Profile)] = [];
+    private var profiles = HashMap.HashMap<Principal, Profile>(0, Principal.equal, Principal.hash);
+
+    system func preupgrade() {
+        postEntries := Iter.toArray(posts.entries());
+        profileEntries := Iter.toArray(profiles.entries());
     };
 
-    let post : Post = {
-      id = nextId;
-      title = title;
-      body = body;
-      author = msg.caller;
-      authorUsername = authorProfile.username;
-      timestamp = Time.now();
+    system func postupgrade() {
+        posts := HashMap.fromIter<Nat, Post>(postEntries.vals(), 0, Nat.equal, Nat.hash);
+        profiles := HashMap.fromIter<Principal, Profile>(profileEntries.vals(), 0, Principal.equal, Principal.hash);
     };
 
-    posts := Array.append(posts, [post]);
-    nextId += 1;
-    #ok(())
-  };
+    public shared(msg) func createPost(title: Text, body: Text) : async Nat {
+        let authorUsername = switch (profiles.get(msg.caller)) {
+            case (null) { "Anonymous" };
+            case (?profile) { profile.username };
+        };
 
-  public query func getPosts() : async [Post] {
-    Array.reverse(posts)
-  };
+        let post : Post = {
+            id = nextPostId;
+            title = title;
+            body = body;
+            authorUsername = authorUsername;
+            timestamp = Time.now();
+        };
 
-  public shared(msg) func updateProfile(username: Text, bio: Text, picture: ?Blob) : async Result.Result<(), Text> {
-    if (Principal.isAnonymous(msg.caller)) {
-      return #err("You must be logged in to update your profile");
+        posts.put(nextPostId, post);
+        nextPostId += 1;
+        nextPostId - 1
     };
 
-    let profile : Profile = {
-      username = username;
-      bio = bio;
-      picture = picture;
+    public query func getPosts() : async [Post] {
+        Iter.toArray(posts.vals())
     };
 
-    let index = Array.indexOf<(Principal, Profile)>((msg.caller, profile), profiles, func((p1, _), (p2, _)) { p1 == p2 });
-    switch (index) {
-      case (null) { profiles := Array.append(profiles, [(msg.caller, profile)]); };
-      case (?i) { profiles := Array.tabulate<(Principal, Profile)>(profiles.size(), func(j) {
-        if (j == i) { (msg.caller, profile) } else { profiles[j] }
-      }); };
+    public shared(msg) func updateProfile(username: Text, bio: Text, picture: ?[Nat8]) : async () {
+        let profile : Profile = {
+            username = username;
+            bio = bio;
+            picture = Option.map(picture, Blob.fromArray);
+        };
+        profiles.put(msg.caller, profile);
     };
 
-    #ok(())
-  };
-
-  public shared(msg) func getProfile() : async Result.Result<Profile, Text> {
-    if (Principal.isAnonymous(msg.caller)) {
-      return #err("You must be logged in to view your profile");
+    public shared(msg) func getProfile() : async Result.Result<Profile, Text> {
+        switch (profiles.get(msg.caller)) {
+            case (null) { #err("Profile not found") };
+            case (?profile) { #ok(profile) };
+        }
     };
-
-    getProfileByPrincipal(msg.caller)
-  };
-
-  func getProfileByPrincipal(p: Principal) : Result.Result<Profile, Text> {
-    let index = Array.indexOf<(Principal, Profile)>((p, { username = ""; bio = ""; picture = null }), profiles, func((p1, _), (p2, _)) { p1 == p2 });
-    switch (index) {
-      case (null) { #err("Profile not found") };
-      case (?i) { #ok(profiles[i].1) };
-    }
-  };
 }

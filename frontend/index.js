@@ -70,7 +70,7 @@ async function updateProfile(event) {
     const username = document.getElementById('username').value;
     const bio = document.getElementById('bio').value;
     const pictureInput = document.getElementById('profilePicture');
-    let picture = null;
+    let picture = [];
     if (pictureInput.files.length > 0) {
         const file = pictureInput.files[0];
         const arrayBuffer = await file.arrayBuffer();
