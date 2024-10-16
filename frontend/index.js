@@ -1,4 +1,5 @@
 import { AuthClient } from "@dfinity/auth-client";
+import { Actor, HttpAgent } from "@dfinity/agent";
 import { backend } from "declarations/backend";
 
 let authClient;
@@ -65,7 +66,11 @@ async function createPost() {
 
   try {
     const identity = await authClient.getIdentity();
-    const authenticatedBackend = backend.createActor(identity);
+    const agent = new HttpAgent({ identity });
+    const authenticatedBackend = Actor.createActor(backend.__factory, {
+      agent,
+      canisterId: backend.canisterId,
+    });
     const result = await authenticatedBackend.createPost(title, body);
     if ('ok' in result) {
       alert("Post created successfully!");
