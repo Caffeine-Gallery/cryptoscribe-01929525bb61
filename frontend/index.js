@@ -185,7 +185,7 @@ async function showProfile() {
 
 async function createDefaultProfile() {
   try {
-    await authenticatedBackend.updateProfile("", "", null);
+    await authenticatedBackend.updateProfile("", "", []);
   } catch (error) {
     console.error("Error creating default profile:", error);
   }
@@ -203,10 +203,10 @@ async function updateProfile(event) {
   const bio = document.getElementById("bio").value;
   const pictureInput = document.getElementById("profilePicture");
   
-  let picture = null;
+  let picture = [];
   if (pictureInput.files.length > 0) {
     const file = pictureInput.files[0];
-    picture = await file.arrayBuffer();
+    picture = new Uint8Array(await file.arrayBuffer());
   }
 
   try {
@@ -234,7 +234,7 @@ async function showUserProfile(principal) {
       document.getElementById("userProfileUsername").textContent = result.ok.username;
       document.getElementById("userProfileBio").textContent = result.ok.bio;
       const profilePicture = document.getElementById("userProfilePicture");
-      if (result.ok.picture) {
+      if (result.ok.picture && result.ok.picture.length > 0) {
         profilePicture.src = URL.createObjectURL(new Blob([result.ok.picture]));
         profilePicture.style.display = "block";
       } else {
