@@ -7,6 +7,7 @@ import { canisterId } from "declarations/backend/index.js";
 let authClient;
 let quill;
 let authenticatedBackend;
+let anonymousBackend;
 
 const loginBtn = document.getElementById("loginBtn");
 const newPostBtn = document.getElementById("newPostBtn");
@@ -22,6 +23,8 @@ const userProfileSection = document.getElementById("userProfileSection");
 
 async function init() {
   authClient = await AuthClient.create();
+  await setupAnonymousBackend();
+  
   if (await authClient.isAuthenticated()) {
     loginBtn.textContent = "Logout";
     await setupAuthenticatedBackend();
@@ -39,6 +42,14 @@ async function init() {
   profileForm.onsubmit = updateProfile;
 
   await refreshPosts();
+}
+
+async function setupAnonymousBackend() {
+  const agent = new HttpAgent();
+  anonymousBackend = Actor.createActor(idlFactory, {
+    agent,
+    canisterId,
+  });
 }
 
 async function setupAuthenticatedBackend() {
@@ -108,27 +119,32 @@ async function createPost() {
 }
 
 async function refreshPosts() {
-  const posts = await authenticatedBackend.getPosts();
-  postsSection.innerHTML = "";
-  posts.forEach(post => {
-    const postElement = document.createElement("article");
-    postElement.innerHTML = `
-      <h2>${post.title}</h2>
-      <p>By <a href="#" class="author-link" data-principal="${post.author.toText()}">${post.author.toText()}</a></p>
-      <div>${post.body}</div>
-      <small>${new Date(Number(post.timestamp) / 1000000).toLocaleString()}</small>
-    `;
-    postsSection.appendChild(postElement);
-  });
-
-  // Add event listeners to author links
-  document.querySelectorAll('.author-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const principal = e.target.dataset.principal;
-      showUserProfile(Principal.fromText(principal));
+  try {
+    const posts = await anonymousBackend.getPosts();
+    postsSection.innerHTML = "";
+    posts.forEach(post => {
+      const postElement = document.createElement("article");
+      postElement.innerHTML = `
+        <h2>${post.title}</h2>
+        <p>By <a href="#" class="author-link" data-principal="${post.author.toText()}">${post.author.toText()}</a></p>
+        <div>${post.body}</div>
+        <small>${new Date(Number(post.timestamp) / 1000000).toLocaleString()}</small>
+      `;
+      postsSection.appendChild(postElement);
     });
-  });
+
+    // Add event listeners to author links
+    document.querySelectorAll('.author-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const principal = e.target.dataset.principal;
+        showUserProfile(Principal.fromText(principal));
+      });
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    postsSection.innerHTML = "<p>An error occurred while fetching posts.</p>";
+  }
 }
 
 function showHome() {
@@ -154,11 +170,24 @@ async function showProfile() {
     if ('ok' in result) {
       document.getElementById("username").value = result.ok.username;
       document.getElementById("bio").value = result.ok.bio;
+    } else if (result.err === "Profile not found") {
+      // Create a default profile if it doesn't exist
+      await createDefaultProfile();
+      document.getElementById("username").value = "";
+      document.getElementById("bio").value = "";
     } else {
       console.error("Error fetching profile:", result.err);
     }
   } catch (error) {
     console.error("Error fetching profile:", error);
+  }
+}
+
+async function createDefaultProfile() {
+  try {
+    await authenticatedBackend.updateProfile("", "", null);
+  } catch (error) {
+    console.error("Error creating default profile:", error);
   }
 }
 
@@ -200,7 +229,7 @@ async function showUserProfile(principal) {
   userProfileSection.style.display = "block";
 
   try {
-    const result = await authenticatedBackend.getProfileByPrincipal(principal);
+    const result = await anonymousBackend.getProfileByPrincipal(principal);
     if ('ok' in result) {
       document.getElementById("userProfileUsername").textContent = result.ok.username;
       document.getElementById("userProfileBio").textContent = result.ok.bio;
