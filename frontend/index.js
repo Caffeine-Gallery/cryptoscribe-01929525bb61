@@ -64,7 +64,9 @@ async function createPost() {
   submitPost.textContent = "Submitting...";
 
   try {
-    const result = await backend.createPost(title, body);
+    const identity = await authClient.getIdentity();
+    const authenticatedBackend = backend.createActor(identity);
+    const result = await authenticatedBackend.createPost(title, body);
     if ('ok' in result) {
       alert("Post created successfully!");
       postTitle.value = "";
