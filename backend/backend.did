@@ -27,5 +27,5 @@ service : {
   createPost: (text, text) -> (nat);
   getPosts: () -> (vec Post) query;
   getProfile: () -> (Result_1);
-  updateProfile: (text, text, opt vec nat8) -> (Result);
+  updateProfile: (text, text, vec nat8) -> (Result);
 }

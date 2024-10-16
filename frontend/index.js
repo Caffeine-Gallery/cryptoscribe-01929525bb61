@@ -83,9 +83,13 @@ async function updateProfile(event) {
             const arrayBuffer = await file.arrayBuffer();
             picture = Array.from(new Uint8Array(arrayBuffer));
         }
-        await backend.updateProfile(username, bio, picture.length > 0 ? picture : null);
-        console.log('Profile updated successfully');
-        loadProfile();
+        const result = await backend.updateProfile(username, bio, picture);
+        if ('ok' in result) {
+            console.log('Profile updated successfully');
+            loadProfile();
+        } else {
+            console.error('Failed to update profile:', result.err);
+        }
     } catch (error) {
         console.error('Error updating profile:', error);
     }

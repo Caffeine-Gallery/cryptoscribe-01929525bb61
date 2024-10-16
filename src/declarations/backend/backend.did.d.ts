@@ -24,7 +24,7 @@ export interface _SERVICE {
   'getPosts' : ActorMethod<[], Array<Post>>,
   'getProfile' : ActorMethod<[], Result_1>,
   'updateProfile' : ActorMethod<
-    [string, string, [] | [Uint8Array | number[]]],
+    [string, string, Uint8Array | number[]],
     Result
   >,
 }

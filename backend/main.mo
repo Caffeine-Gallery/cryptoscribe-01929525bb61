@@ -1,10 +1,10 @@
-import Error "mo:base/Error";
 import Hash "mo:base/Hash";
 import Nat8 "mo:base/Nat8";
 
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
+import Error "mo:base/Error";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
@@ -69,12 +69,12 @@ actor {
         Iter.toArray(posts.vals())
     };
 
-    public shared(msg) func updateProfile(username: Text, bio: Text, picture: ?[Nat8]) : async Result.Result<(), Text> {
+    public shared(msg) func updateProfile(username: Text, bio: Text, picture: [Nat8]) : async Result.Result<(), Text> {
         try {
             let profile : Profile = {
                 username = username;
                 bio = bio;
-                picture = Option.map(picture, Blob.fromArray);
+                picture = if (picture.size() > 0) ?Blob.fromArray(picture) else null;
             };
             profiles.put(msg.caller, profile);
             #ok(())
