@@ -10,7 +10,11 @@
 <body>
     <header>
         <h1>Crypto Blog</h1>
-        <button id="loginBtn">Login</button>
+        <nav>
+            <button id="homeBtn">Home</button>
+            <button id="profileBtn">Profile</button>
+            <button id="loginBtn">Login</button>
+        </nav>
     </header>
     <main>
         <section id="posts"></section>
@@ -19,6 +23,15 @@
             <input type="text" id="postTitle" placeholder="Title">
             <div id="editor"></div>
             <button id="submitPost">Submit Post</button>
+        </div>
+        <div id="profileSection" style="display: none;">
+            <h2>Your Profile</h2>
+            <form id="profileForm">
+                <input type="text" id="username" placeholder="Username">
+                <textarea id="bio" placeholder="Bio"></textarea>
+                <input type="file" id="profilePicture" accept="image/*">
+                <button type="submit">Update Profile</button>
+            </form>
         </div>
     </main>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>

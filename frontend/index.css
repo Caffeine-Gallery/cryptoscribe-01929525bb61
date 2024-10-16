@@ -19,6 +19,10 @@ h1 {
     margin: 0;
 }
 
+nav button {
+    margin-left: 10px;
+}
+
 button {
     background-color: #1a8917;
     color: white;
@@ -72,4 +76,23 @@ article p {
 
 article small {
     color: #999;
+}
+
+#profileSection {
+    margin-top: 20px;
+}
+
+#profileForm input[type="text"],
+#profileForm textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#profileForm textarea {
+    height: 100px;
+}
+
+#profileForm input[type="file"] {
+    margin-bottom: 10px;
 }
