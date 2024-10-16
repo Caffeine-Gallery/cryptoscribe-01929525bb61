@@ -5,6 +5,7 @@ import type { IDL } from '@dfinity/candid';
 export interface Post {
   'id' : bigint,
   'title' : string,
+  'authorUsername' : string,
   'body' : string,
   'author' : Principal,
   'timestamp' : bigint,
@@ -22,7 +23,6 @@ export interface _SERVICE {
   'createPost' : ActorMethod<[string, string], Result>,
   'getPosts' : ActorMethod<[], Array<Post>>,
   'getProfile' : ActorMethod<[], Result_1>,
-  'getProfileByPrincipal' : ActorMethod<[Principal], Result_1>,
   'updateProfile' : ActorMethod<
     [string, string, [] | [Uint8Array | number[]]],
     Result

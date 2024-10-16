@@ -17,6 +17,7 @@ type Profile =
 type Post = 
  record {
    author: principal;
+   authorUsername: text;
    body: text;
    id: nat;
    timestamp: int;
@@ -25,7 +26,6 @@ type Post =
 service : {
   createPost: (text, text) -> (Result);
   getPosts: () -> (vec Post) query;
-  getProfile: () -> (Result_1) query;
-  getProfileByPrincipal: (principal) -> (Result_1) query;
+  getProfile: () -> (Result_1);
   updateProfile: (text, text, opt blob) -> (Result);
 }

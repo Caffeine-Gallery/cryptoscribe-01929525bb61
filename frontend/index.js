@@ -126,7 +126,7 @@ async function refreshPosts() {
       const postElement = document.createElement("article");
       postElement.innerHTML = `
         <h2>${post.title}</h2>
-        <p>By <a href="#" class="author-link" data-principal="${post.author.toText()}">${post.author.toText()}</a></p>
+        <p>By <a href="#" class="author-link" data-principal="${post.author.toText()}">${post.authorUsername || 'Anonymous'}</a></p>
         <div>${post.body}</div>
         <small>${new Date(Number(post.timestamp) / 1000000).toLocaleString()}</small>
       `;
@@ -231,7 +231,7 @@ async function showUserProfile(principal) {
   try {
     const result = await anonymousBackend.getProfileByPrincipal(principal);
     if ('ok' in result) {
-      document.getElementById("userProfileUsername").textContent = result.ok.username;
+      document.getElementById("userProfileUsername").textContent = result.ok.username || 'Anonymous';
       document.getElementById("userProfileBio").textContent = result.ok.bio;
       const profilePicture = document.getElementById("userProfilePicture");
       if (result.ok.picture && result.ok.picture.length > 0) {

@@ -14,6 +14,7 @@ actor {
     title: Text;
     body: Text;
     author: Principal;
+    authorUsername: Text;
     timestamp: Int;
   };
 
@@ -32,11 +33,24 @@ actor {
       return #err("You must be logged in to create a post");
     };
 
+    let defaultProfile : Profile = {
+      username = "Anonymous";
+      bio = "";
+      picture = null;
+    };
+
+    let authorProfileResult = getProfileByPrincipal(msg.caller);
+    let authorProfile = switch (authorProfileResult) {
+      case (#ok(profile)) profile;
+      case (#err(_)) defaultProfile;
+    };
+
     let post : Post = {
       id = nextId;
       title = title;
       body = body;
       author = msg.caller;
+      authorUsername = authorProfile.username;
       timestamp = Time.now();
     };
 
@@ -71,19 +85,15 @@ actor {
     #ok(())
   };
 
-  public query(msg) func getProfile() : async Result.Result<Profile, Text> {
+  public shared(msg) func getProfile() : async Result.Result<Profile, Text> {
     if (Principal.isAnonymous(msg.caller)) {
       return #err("You must be logged in to view your profile");
     };
 
-    let index = Array.indexOf<(Principal, Profile)>((msg.caller, { username = ""; bio = ""; picture = null }), profiles, func((p1, _), (p2, _)) { p1 == p2 });
-    switch (index) {
-      case (null) { #err("Profile not found") };
-      case (?i) { #ok(profiles[i].1) };
-    }
+    getProfileByPrincipal(msg.caller)
   };
 
-  public query func getProfileByPrincipal(p: Principal) : async Result.Result<Profile, Text> {
+  func getProfileByPrincipal(p: Principal) : Result.Result<Profile, Text> {
     let index = Array.indexOf<(Principal, Profile)>((p, { username = ""; bio = ""; picture = null }), profiles, func((p1, _), (p2, _)) { p1 == p2 });
     switch (index) {
       case (null) { #err("Profile not found") };

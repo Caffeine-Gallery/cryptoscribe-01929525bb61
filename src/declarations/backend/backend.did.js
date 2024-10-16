@@ -3,6 +3,7 @@ export const idlFactory = ({ IDL }) => {
   const Post = IDL.Record({
     'id' : IDL.Nat,
     'title' : IDL.Text,
+    'authorUsername' : IDL.Text,
     'body' : IDL.Text,
     'author' : IDL.Principal,
     'timestamp' : IDL.Int,
@@ -16,8 +17,7 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     'createPost' : IDL.Func([IDL.Text, IDL.Text], [Result], []),
     'getPosts' : IDL.Func([], [IDL.Vec(Post)], ['query']),
-    'getProfile' : IDL.Func([], [Result_1], ['query']),
-    'getProfileByPrincipal' : IDL.Func([IDL.Principal], [Result_1], ['query']),
+    'getProfile' : IDL.Func([], [Result_1], []),
     'updateProfile' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Opt(IDL.Vec(IDL.Nat8))],
         [Result],
