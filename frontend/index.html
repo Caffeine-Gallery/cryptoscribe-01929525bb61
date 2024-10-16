@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Blog</title>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header>
+        <h1>Crypto Blog</h1>
+        <button id="loginBtn">Login</button>
+    </header>
+    <main>
+        <section id="posts"></section>
+        <button id="newPostBtn">New Post</button>
+        <div id="newPostForm" style="display: none;">
+            <input type="text" id="postTitle" placeholder="Title">
+            <div id="editor"></div>
+            <button id="submitPost">Submit Post</button>
+        </div>
+    </main>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script type="module" src="index.js"></script>
+</body>
+</html>
