@@ -78,7 +78,7 @@ article small {
     color: #999;
 }
 
-#profileSection {
+#profileSection, #userProfileSection {
     margin-top: 20px;
 }
 
@@ -95,4 +95,13 @@ article small {
 
 #profileForm input[type="file"] {
     margin-bottom: 10px;
+}
+
+.author-link {
+    color: #1a8917;
+    text-decoration: none;
+}
+
+.author-link:hover {
+    text-decoration: underline;
 }

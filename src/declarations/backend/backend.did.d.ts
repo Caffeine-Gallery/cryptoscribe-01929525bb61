@@ -6,7 +6,7 @@ export interface Post {
   'id' : bigint,
   'title' : string,
   'body' : string,
-  'author' : string,
+  'author' : Principal,
   'timestamp' : bigint,
 }
 export interface Profile {
@@ -22,6 +22,7 @@ export interface _SERVICE {
   'createPost' : ActorMethod<[string, string], Result>,
   'getPosts' : ActorMethod<[], Array<Post>>,
   'getProfile' : ActorMethod<[], Result_1>,
+  'getProfileByPrincipal' : ActorMethod<[Principal], Result_1>,
   'updateProfile' : ActorMethod<
     [string, string, [] | [Uint8Array | number[]]],
     Result

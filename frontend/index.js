@@ -1,5 +1,6 @@
 import { AuthClient } from "@dfinity/auth-client";
 import { Actor, HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 import { idlFactory } from "declarations/backend/backend.did.js";
 import { canisterId } from "declarations/backend/index.js";
 
@@ -17,6 +18,7 @@ const homeBtn = document.getElementById("homeBtn");
 const profileBtn = document.getElementById("profileBtn");
 const profileSection = document.getElementById("profileSection");
 const profileForm = document.getElementById("profileForm");
+const userProfileSection = document.getElementById("userProfileSection");
 
 async function init() {
   authClient = await AuthClient.create();
@@ -112,11 +114,20 @@ async function refreshPosts() {
     const postElement = document.createElement("article");
     postElement.innerHTML = `
       <h2>${post.title}</h2>
-      <p>By ${post.author}</p>
+      <p>By <a href="#" class="author-link" data-principal="${post.author.toText()}">${post.author.toText()}</a></p>
       <div>${post.body}</div>
       <small>${new Date(Number(post.timestamp) / 1000000).toLocaleString()}</small>
     `;
     postsSection.appendChild(postElement);
+  });
+
+  // Add event listeners to author links
+  document.querySelectorAll('.author-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const principal = e.target.dataset.principal;
+      showUserProfile(Principal.fromText(principal));
+    });
   });
 }
 
@@ -124,6 +135,7 @@ function showHome() {
   postsSection.style.display = "block";
   newPostBtn.style.display = "block";
   profileSection.style.display = "none";
+  userProfileSection.style.display = "none";
 }
 
 async function showProfile() {
@@ -135,6 +147,7 @@ async function showProfile() {
   postsSection.style.display = "none";
   newPostBtn.style.display = "none";
   profileSection.style.display = "block";
+  userProfileSection.style.display = "none";
 
   try {
     const result = await authenticatedBackend.getProfile();
@@ -177,6 +190,34 @@ async function updateProfile(event) {
   } catch (error) {
     console.error("Error updating profile:", error);
     alert("An error occurred while updating the profile");
+  }
+}
+
+async function showUserProfile(principal) {
+  postsSection.style.display = "none";
+  newPostBtn.style.display = "none";
+  profileSection.style.display = "none";
+  userProfileSection.style.display = "block";
+
+  try {
+    const result = await authenticatedBackend.getProfileByPrincipal(principal);
+    if ('ok' in result) {
+      document.getElementById("userProfileUsername").textContent = result.ok.username;
+      document.getElementById("userProfileBio").textContent = result.ok.bio;
+      const profilePicture = document.getElementById("userProfilePicture");
+      if (result.ok.picture) {
+        profilePicture.src = URL.createObjectURL(new Blob([result.ok.picture]));
+        profilePicture.style.display = "block";
+      } else {
+        profilePicture.style.display = "none";
+      }
+    } else {
+      console.error("Error fetching user profile:", result.err);
+      userProfileSection.innerHTML = "<p>User profile not found.</p>";
+    }
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    userProfileSection.innerHTML = "<p>An error occurred while fetching the user profile.</p>";
   }
 }
 

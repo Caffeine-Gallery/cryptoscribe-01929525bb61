@@ -4,7 +4,7 @@ export const idlFactory = ({ IDL }) => {
     'id' : IDL.Nat,
     'title' : IDL.Text,
     'body' : IDL.Text,
-    'author' : IDL.Text,
+    'author' : IDL.Principal,
     'timestamp' : IDL.Int,
   });
   const Profile = IDL.Record({
@@ -17,6 +17,7 @@ export const idlFactory = ({ IDL }) => {
     'createPost' : IDL.Func([IDL.Text, IDL.Text], [Result], []),
     'getPosts' : IDL.Func([], [IDL.Vec(Post)], ['query']),
     'getProfile' : IDL.Func([], [Result_1], ['query']),
+    'getProfileByPrincipal' : IDL.Func([IDL.Principal], [Result_1], ['query']),
     'updateProfile' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Opt(IDL.Vec(IDL.Nat8))],
         [Result],
