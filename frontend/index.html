@@ -3,43 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Blog</title>
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <title>Blog App</title>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
+    <div id="banner">
+        <img src="https://placeholder.com/wp-content/uploads/2018/10/placeholder.com-logo1.png" alt="Cryptography Banner">
+    </div>
     <header>
-        <h1>Crypto Blog</h1>
+        <h1>Blog App</h1>
         <nav>
             <button id="homeBtn">Home</button>
-            <button id="profileBtn">My Profile</button>
+            <button id="profileBtn">Profile</button>
             <button id="loginBtn">Login</button>
         </nav>
     </header>
     <main>
-        <section id="posts"></section>
+        <section id="posts">
+            <!-- Posts will be dynamically added here -->
+        </section>
         <button id="newPostBtn">New Post</button>
-        <div id="newPostForm" style="display: none;">
-            <input type="text" id="postTitle" placeholder="Title">
+        <form id="newPostForm" style="display: none;">
+            <input type="text" id="postTitle" placeholder="Title" required>
             <div id="editor"></div>
-            <button id="submitPost">Submit Post</button>
-        </div>
-        <div id="profileSection" style="display: none;">
+            <button type="button" id="submitPost">Submit Post</button>
+        </form>
+        <section id="profileSection" style="display: none;">
             <h2>Your Profile</h2>
             <form id="profileForm">
-                <input type="text" id="username" placeholder="Username">
+                <input type="text" id="username" placeholder="Username" required>
                 <textarea id="bio" placeholder="Bio"></textarea>
                 <input type="file" id="profilePicture" accept="image/*">
                 <button type="submit">Update Profile</button>
             </form>
-        </div>
-        <div id="userProfileSection" style="display: none;">
-            <h2 id="userProfileUsername"></h2>
+        </section>
+        <section id="userProfileSection" style="display: none;">
+            <h2>User Profile</h2>
+            <p id="userProfileUsername"></p>
             <p id="userProfileBio"></p>
-            <img id="userProfilePicture" style="max-width: 200px; max-height: 200px;">
-        </div>
+            <img id="userProfilePicture" style="display: none;">
+        </section>
     </main>
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script type="module" src="index.js"></script>
 </body>
 </html>
