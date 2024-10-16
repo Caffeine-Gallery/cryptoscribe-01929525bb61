@@ -7,9 +7,9 @@ body {
 
 #banner {
     width: 100%;
-    height: 200px;
-    overflow: hidden;
+    height: 300px;
     position: relative;
+    overflow: hidden;
 }
 
 #banner img {
@@ -18,11 +18,24 @@ body {
     object-fit: cover;
 }
 
-header {
-    background-color: #333;
+.banner-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
     text-align: center;
-    padding: 1rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
 }
 
 nav {
@@ -33,13 +46,18 @@ button {
     background-color: #4CAF50;
     border: none;
     color: white;
-    padding: 15px 32px;
+    padding: 10px 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
 }
 
 main {
