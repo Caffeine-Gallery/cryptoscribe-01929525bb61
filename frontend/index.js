@@ -1,6 +1,7 @@
 import { AuthClient } from "@dfinity/auth-client";
 import { Actor, HttpAgent } from "@dfinity/agent";
-import { backend } from "declarations/backend";
+import { idlFactory } from "declarations/backend/backend.did.js";
+import { canisterId } from "declarations/backend/index.js";
 
 let authClient;
 let quill;
@@ -67,9 +68,9 @@ async function createPost() {
   try {
     const identity = await authClient.getIdentity();
     const agent = new HttpAgent({ identity });
-    const authenticatedBackend = Actor.createActor(backend.__factory, {
+    const authenticatedBackend = Actor.createActor(idlFactory, {
       agent,
-      canisterId: backend.canisterId,
+      canisterId,
     });
     const result = await authenticatedBackend.createPost(title, body);
     if ('ok' in result) {
@@ -91,7 +92,13 @@ async function createPost() {
 }
 
 async function refreshPosts() {
-  const posts = await backend.getPosts();
+  const identity = await authClient.getIdentity();
+  const agent = new HttpAgent({ identity });
+  const authenticatedBackend = Actor.createActor(idlFactory, {
+    agent,
+    canisterId,
+  });
+  const posts = await authenticatedBackend.getPosts();
   postsSection.innerHTML = "";
   posts.forEach(post => {
     const postElement = document.createElement("article");
